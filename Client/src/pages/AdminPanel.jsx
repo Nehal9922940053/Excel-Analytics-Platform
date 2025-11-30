@@ -33,6 +33,7 @@ const AdminPanel = ({ onBackToDashboard }) => {
     setIsLoading(true);
     try {
       const token = userInfo.token;
+      const API_URL = import.meta.env.VITE_API_URL;
       const response = await fetch(`${API_URL}/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -15,13 +15,19 @@ const app = express();
 // Middleware
 const allowedOrigins = [
     "https://excel-analytics-platform-nehal.netlify.app",
-    "https://excel-analytics-backend.onrender.com", // Your Render backend
+    // "https://excel-analytics-backend.onrender.com", 
     "http://localhost:3000",
     "http://localhost:5173"
 ];
 
 app.use(cors({
-    origin: allowedOrigins,
+    origin: function(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -38,11 +44,32 @@ if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir);
 }
 
+
+// Test endpoint
+app.get("/api/test", (req, res) => {
+    res.json({
+        message: "Backend is working!",
+        env: process.env.NODE_ENV,
+        port: PORT
+    });
+});
+
 // Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/upload", require("./routes/upload"));
 app.use("/api/data", require("./routes/data"));
 app.use("/api/admin", require("./routes/admin"));
+
+
+
+
+
+
+// Routes
+// app.use("/api/auth", require("./routes/auth"));
+// app.use("/api/upload", require("./routes/upload"));
+// app.use("/api/data", require("./routes/data"));
+// app.use("/api/admin", require("./routes/admin"));
 
 // Basic route for testing
 app.get("/api/health", (req, res) => {

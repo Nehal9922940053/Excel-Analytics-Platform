@@ -23,14 +23,15 @@ const DataTable = ({analysisId, columns}) => {
     const fetchData = async (page) => {
         setIsLoading(true);
         try {
-            const token = JSON.parse(localStorage.getItem("userInfo")).token;
+              const token = JSON.parse(localStorage.getItem("userInfo")).token;
+        const apiUrl = import.meta.env.VITE_API_URL; // Add this
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             };
-
-            let url = `${import.meta.env.VITE_API_URL}/data/${analysisId}/data?page=${page}&limit=${itemsPerPage}`;
+             let url = `${apiUrl}/data/${analysisId}/data?page=${page}&limit=${itemsPerPage}`;
+            // let url = `${import.meta.env.VITE_API_URL}/data/${analysisId}/data?page=${page}&limit=${itemsPerPage}`;
             if (searchTerm) {
                 url += `&search=${encodeURIComponent(searchTerm)}`;
             }

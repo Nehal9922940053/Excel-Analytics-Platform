@@ -15,7 +15,7 @@ const app = express();
 // Middleware
 const allowedOrigins = [
     "https://excel-analytics-platform-nehal.netlify.app",
-    // "https://excel-analytics-backend.onrender.com", 
+    "https://excel-analytics-backend.onrender.com", 
     "http://localhost:3000",
     "http://localhost:5173"
 ];

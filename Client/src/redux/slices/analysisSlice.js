@@ -7,7 +7,7 @@ import axios from "axios";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const API_URL = `${API_BASE_URL}/api`;
 
-console.log("Analysis API URL:", API_URL); // Debug log
+console.log("Analysis API URL:", API_URL); 
 
 const initialState = {
     analyses: [],

@@ -13,7 +13,20 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+    "https://excel-analytics-platform-nehal.netlify.app",
+    "https://excel-analytics-backend.onrender.com", // Your Render backend
+    "http://localhost:3000",
+    "http://localhost:5173"
+];
+
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+// app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

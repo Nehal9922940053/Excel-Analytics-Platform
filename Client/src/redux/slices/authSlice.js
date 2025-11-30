@@ -3,7 +3,8 @@ import axios from "axios";
 
 // const API_URL = "/api/auth";
 
-const API_URL = "http://localhost:5000/api/auth";
+// const API_URL = "http://localhost:5000/api/auth";
+const API_URL = `${import.meta.env.VITE_API_URL}/auth`;
 
 // Get user from localStorage
 const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -19,7 +20,7 @@ const initialState = {
 // Login user
 export const login = createAsyncThunk("auth/login", async ({email, password}, thunkAPI) => {
     try {
-        const response = await axios.post(API_URL + "/login", {
+        const response = await axios.post(`${API_URL}/login`, {
             email,
             password,
         });
@@ -50,7 +51,7 @@ export const logoutt = createAsyncThunk('auth/logoutt', async (_, thunkAPI) => {
 // Register user
 export const register = createAsyncThunk("auth/register", async ({email, password}, thunkAPI) => {
     try {
-        const response = await axios.post(API_URL + "/register", {
+        const response = await axios.post(`${API_URL}/register`, {
             email,
             password,
         });

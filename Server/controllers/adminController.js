@@ -1,59 +1,3 @@
-// const User = require("../models/User");
-// const Analysis = require("../models/Analysis");
-
-// // Get all users (admin only)
-// exports.getUsers = async (req, res) => {
-//     try {
-//         const users = await User.find({}).select("-password");
-//         res.json(users);
-//     } catch (error) {
-//         res.status(500).json({message: "Server error: " + error.message});
-//     }
-// };
-
-// // Get all analyses (admin only)
-// exports.getAllAnalyses = async (req, res) => {
-//     try {
-//         const analyses = await Analysis.find({}).populate("userId", "email");
-//         res.json(analyses);
-//     } catch (error) {
-//         res.status(500).json({message: "Server error: " + error.message});
-//     }
-// };
-
-// // Delete user (admin only)
-// exports.deleteUser = async (req, res) => {
-//     try {
-//         const user = await User.findById(req.params.id);
-
-//         if (user) {
-//             // Also delete all analyses by this user
-//             await Analysis.deleteMany({userId: user._id});
-//             await User.findByIdAndDelete(req.params.id);
-//             res.json({message: "User removed"});
-//         } else {
-//             res.status(404).json({message: "User not found"});
-//         }
-//     } catch (error) {
-//         res.status(500).json({message: "Server error: " + error.message});
-//     }
-// };
-
-// // Delete analysis (admin only)
-// exports.deleteAnalysis = async (req, res) => {
-//     try {
-//         const analysis = await Analysis.findById(req.params.id);
-
-//         if (analysis) {
-//             await Analysis.findByIdAndDelete(req.params.id);
-//             res.json({message: "Analysis removed"});
-//         } else {
-//             res.status(404).json({message: "Analysis not found"});
-//         }
-//     } catch (error) {
-//         res.status(500).json({message: "Server error: " + error.message});
-//     }
-// };
 
 
 const User = require("../models/User");
@@ -172,13 +116,14 @@ exports.getAdminStats = async (req, res) => {
         
         // Count analyses with chart configurations
         const totalCharts = await Analysis.countDocuments({ 
+             "chartConfig": { $exists: true, $ne: null },
             "chartConfig.xAxis": { $exists: true, $ne: null },
             "chartConfig.yAxis": { $exists: true, $ne: null }
         });
         
         // Count analyses with AI insights
         const totalAIInsights = await Analysis.countDocuments({ 
-            "summary": { $exists: true, $ne: '' } 
+            "summary": { $exists: true, $ne: null, $ne: ''} 
         });
 
         res.json({

@@ -30,7 +30,7 @@ const DataTable = ({analysisId, columns}) => {
                     Authorization: `Bearer ${token}`,
                 },
             };
-             let url = `${apiUrl}/data/${analysisId}/data?page=${page}&limit=${itemsPerPage}`;
+         let url = `${apiUrl}/api/data/${analysisId}/data?page=${page}&limit=${itemsPerPage}`;
             // let url = `${import.meta.env.VITE_API_URL}/data/${analysisId}/data?page=${page}&limit=${itemsPerPage}`;
             if (searchTerm) {
                 url += `&search=${encodeURIComponent(searchTerm)}`;

@@ -71,7 +71,7 @@ const Chart = ({analysisId, columns, chartConfig}) => {
 
 
              const response = await axios.get(
-            `${apiUrl}/data/${analysisId}/data?page=1&limit=10000`,
+              `${apiUrl}/api/data/${analysisId}/data?page=1&limit=10000`,
             config
         );
 

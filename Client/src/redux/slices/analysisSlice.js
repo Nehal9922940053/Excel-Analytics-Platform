@@ -3,7 +3,11 @@
 import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "/api";
+// const API_URL = import.meta.env.VITE_API_URL || "/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = `${API_BASE_URL}/api`;
+
+console.log("Analysis API URL:", API_URL); // Debug log
 
 const initialState = {
     analyses: [],
@@ -35,8 +39,8 @@ export const getAnalyses = createAsyncThunk("analysis/getAll", async(_, thunkAPI
         const endpoint = isAdmin
             ? "/data/history"
             : "/data/history";
-        const response = await axios.get(API_URL + endpoint, config);
-
+        // const response = await axios.get(API_URL + endpoint, config);
+         const response = await axios.get(`${API_URL}/data/history`, config);
         return response.data;
     } catch (error) {
         const message = (error.response
@@ -56,7 +60,8 @@ export const getAdminStats = createAsyncThunk("analysis/getAdminStats", async(_,
                 Authorization: `Bearer ${token}`
             }
         };
-        const response = await axios.get(API_URL + "/admin/stats", config);
+        // const response = await axios.get(API_URL + "/admin/stats", config);
+         const response = await axios.get(`${API_URL}/admin/stats`, config);
         return response.data;
     } catch (error) {
         const message = (error.response
@@ -81,7 +86,7 @@ export const uploadFile = createAsyncThunk("analysis/upload", async(formData, th
             }
         };
 
-        const response = await axios.post(API_URL + "/upload", formData, config);
+        const response = await axios.post(`${API_URL}/upload`, formData, config);
         return response.data;
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
@@ -103,7 +108,9 @@ export const getAnalysis = createAsyncThunk("analysis/getOne", async(id, thunkAP
             }
         };
 
-        const response = await axios.get(API_URL + `/data/${id}`, config);
+        // const response = await axios.get(API_URL + `/data/${id}`, config);
+
+                const response = await axios.get(`${API_URL}/data/${id}`, config);
         return response.data;
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
@@ -127,7 +134,7 @@ export const saveChartConfig = createAsyncThunk("analysis/saveChart", async({
             }
         };
 
-        const response = await axios.put(API_URL + `/data/${id}/chart`, chartConfig, config);
+        const response = await axios.put(`${API_URL}/data/${id}/chart`, chartConfig, config);
 
         return {
             ...response.data,
@@ -152,7 +159,7 @@ export const getUserStats = createAsyncThunk("analysis/getStats", async(_, thunk
                 Authorization: `Bearer ${token}`
             }
         };
-        const response = await axios.get(API_URL + "/data/stats", config);
+        const response = await axios.get(`${API_URL}/data/stats`, config);
         return response.data;
     } catch (error) {
         const message = (error.response
@@ -176,7 +183,7 @@ export const getInsights = createAsyncThunk("analysis/getInsights", async(id, th
             }
         };
 
-        const response = await axios.post(API_URL + `/data/${id}/insights`, {}, config);
+        const response = await axios.post(`${API_URL}/data/${id}/insights`, {}, config);
 
         return response.data;
     } catch (error) {

@@ -6,6 +6,10 @@ import { getAdminStats } from "../redux/slices/analysisSlice";
 import { logout } from "../redux/slices/authSlice";
 import { Users, FileText, Calendar, User, FileSpreadsheet, Trash2, Eye, Brain, BarChart3, LogOut, ArrowLeft, ChevronDown, TrendingUp, AlertCircle } from "lucide-react";
 
+const getApiUrl = () => {
+    return import.meta.env.VITE_API_URL || "http://localhost:5000";
+};
+
 const AdminPanel = ({ onBackToDashboard }) => {
   const [users, setUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("users");
@@ -33,8 +37,8 @@ const AdminPanel = ({ onBackToDashboard }) => {
     setIsLoading(true);
     try {
       const token = userInfo.token;
-      const API_URL = import.meta.env.VITE_API_URL;
-      const response = await fetch(`${API_URL}/admin/users`, {
+      const API_URL = getApiUrl();
+      const response = await fetch(`${API_URL}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
@@ -55,7 +59,8 @@ const AdminPanel = ({ onBackToDashboard }) => {
   const fetchUserAnalyses = async () => {
     try {
       const token = userInfo.token;
-      const response = await fetch(`${API_URL}/admin/analyses`, {
+        const API_URL = getApiUrl();
+      const response = await fetch(`${API_URL}/api/admin/analyses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
@@ -84,8 +89,9 @@ const AdminPanel = ({ onBackToDashboard }) => {
       }
 
       console.log("Fetching user histories with token:", token.substring(0, 20) + "...");
-      
-      const response = await fetch(`${API_URL}/admin/user-histories`, {
+      const API_URL = getApiUrl();
+       console.log("Fetching user histories from:", `${API_URL}/api/admin/user-histories`);
+      const response = await fetch(`${API_URL}/api/admin/user-histories`, {
         method: "GET",
         headers: { 
           Authorization: `Bearer ${token}`,
@@ -118,7 +124,8 @@ const AdminPanel = ({ onBackToDashboard }) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         const token = userInfo.token;
-        const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+         const API_URL = getApiUrl();
+                const response = await fetch(`${API_URL}/api/admin/users/${userId}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -139,7 +146,8 @@ const AdminPanel = ({ onBackToDashboard }) => {
     if (window.confirm("Are you sure you want to delete this analysis?")) {
       try {
         const token = userInfo.token;
-        const response = await fetch(`${API_URL}/admin/analyses/${analysisId}`, {
+                       const API_URL = getApiUrl();
+                const response = await fetch(`${API_URL}/api/admin/analyses/${analysisId}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         });

@@ -4,8 +4,9 @@ import axios from "axios";
 // const API_URL = "/api/auth";
 
 // const API_URL = "http://localhost:5000/api/auth";
-const API_URL = `${import.meta.env.VITE_API_URL}/auth`;
-
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = `${API_BASE_URL}/api/auth`;
+onsole.log("Auth API URL:", API_URL); 
 // Get user from localStorage
 const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
@@ -20,6 +21,7 @@ const initialState = {
 // Login user
 export const login = createAsyncThunk("auth/login", async ({email, password}, thunkAPI) => {
     try {
+        console.log("Logging in to:", `${API_URL}/login`);
         const response = await axios.post(`${API_URL}/login`, {
             email,
             password,
@@ -31,6 +33,7 @@ export const login = createAsyncThunk("auth/login", async ({email, password}, th
 
         return response.data;
     } catch (error) {
+         console.error("Login error:", error);
         const message =
             (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
         return thunkAPI.rejectWithValue(message);

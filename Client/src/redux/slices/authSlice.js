@@ -6,7 +6,7 @@ import axios from "axios";
 // const API_URL = "http://localhost:5000/api/auth";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const API_URL = `${API_BASE_URL}/api/auth`;
-onsole.log("Auth API URL:", API_URL); 
+console.log("Auth API URL:", API_URL); 
 // Get user from localStorage
 const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 

@@ -1,12 +1,13 @@
 
+
 import React, {useState, useEffect} from "react";
 import {useSelector, useDispatch} from "react-redux";
-import {getAnalyses, uploadFile, setCurrentAnalysis, getUserStats} from "../redux/slices/analysisSlice";
+import {getAnalyses, uploadFile, setCurrentAnalysis, getUserStats, getAdminStats} from "../redux/slices/analysisSlice";
 import { logout } from "../redux/slices/authSlice";
 import FileUpload from "../components/FileUpload";
 import DataTable from "../components/DataTable";
 import Chart from "../components/Chart";
-import AdminPanel from "../pages/AdminPanel"; 
+import AdminPanel from "../pages/AdminPanel";
 import AnalysisHistory from "../components/AnalysisHistory";
 import { Users, FileSpreadsheet, BarChart3, Brain, Eye, LogOut, User, Settings } from "lucide-react";
 
@@ -18,24 +19,26 @@ const Dashboard = () => {
     const {userInfo} = useSelector((state) => state.auth);
     const { analyses, currentAnalysis, isLoading, stats, isSuccess, message } = useSelector((state) => state.analysis);
 
+    console.log("Dashboard - userInfo.isAdmin:", userInfo?.isAdmin);
+    console.log("Dashboard - stats:", stats);
+
+    // Initial load - fetch appropriate data based on user role
     useEffect(() => {
         if (userInfo) {
+            console.log("Loading data for user:", userInfo.email, "isAdmin:", userInfo.isAdmin);
             dispatch(getAnalyses());
-            // Only get user stats if not admin (admin panel has different stats)
-            if (!userInfo.isAdmin) {
-                dispatch(getUserStats());
-            }
+            dispatch(getUserStats());
         }
     }, [userInfo, dispatch]);
 
+    // Refresh stats when chart configuration is saved
     useEffect(() => {
         if (isSuccess && message?.includes("Chart configuration saved")) {
+            console.log("Chart saved, refreshing stats");
             dispatch(getAnalyses());
-            if (!userInfo?.isAdmin) {
-                dispatch(getUserStats());
-            }
+            dispatch(getUserStats());
         }
-    }, [isSuccess, message, dispatch, userInfo]);
+    }, [isSuccess, message, dispatch]);
 
     const handleFileUpload = (file) => {
         const formData = new FormData();
@@ -47,18 +50,28 @@ const Dashboard = () => {
     const handleSelectAnalysis = (analysis) => {
         dispatch(setCurrentAnalysis(analysis));
         setActiveTab("analyze");
-        if (!userInfo?.isAdmin) {
-            dispatch(getUserStats());
-        }
+        dispatch(getUserStats());
+    };
+
+    const handleRefresh = () => {
+        console.log("Refreshing - isAdmin:", userInfo?.isAdmin);
+        dispatch(getAnalyses());
+        dispatch(getUserStats());
     };
 
     const handleLogout = () => {
         dispatch(logout());
     };
 
+    const handleBackFromAdminPanel = () => {
+        setShowAdminPanel(false);
+        // Refresh data when returning from Admin Panel
+        handleRefresh();
+    };
+
     // If user is admin and chooses to view admin panel, show it
     if (userInfo?.isAdmin && showAdminPanel) {
-        return <AdminPanel onBackToDashboard={() => setShowAdminPanel(false)} />;
+        return <AdminPanel onBackToDashboard={handleBackFromAdminPanel} />;
     }
 
     const renderTabContent = () => {
@@ -151,7 +164,10 @@ const Dashboard = () => {
                                         </div>
                                         {userInfo?.isAdmin && (
                                             <button
-                                                onClick={() => setShowAdminPanel(true)}
+                                                onClick={() => {
+                                                    setShowAdminPanel(true);
+                                                    setShowProfile(false);
+                                                }}
                                                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
                                             >
                                                 <Settings className="h-4 w-4 mr-2" />
@@ -170,7 +186,7 @@ const Dashboard = () => {
                             </div>
                             
                             <button
-                                onClick={() => dispatch(getAnalyses())}
+                                onClick={handleRefresh}
                                 disabled={isLoading}
                                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-all duration-300"
                             >
@@ -180,19 +196,26 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Stats Cards - Quick Overview */}
+                    {/* Stats Cards - Show appropriate stats based on user role */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        {/* Total Uploads Card */}
                         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
                             <div className="flex items-center">
                                 <div className="bg-blue-100 p-2 rounded-lg mr-3">
                                     <FileSpreadsheet className="h-5 w-5 text-blue-600" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-gray-600">Total Uploads</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stats?.totalAnalyses || analyses?.length || 0}</p>
+                                    <p className="text-sm font-medium text-gray-600">
+                                        My Uploads
+                                    </p>
+                                    <p className="text-2xl font-bold text-gray-900">
+                                        {stats?.totalAnalyses ?? 0}
+                                    </p>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Charts Generated Card */}
                         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
                             <div className="flex items-center">
                                 <div className="bg-green-100 p-2 rounded-lg mr-3">
@@ -201,16 +224,13 @@ const Dashboard = () => {
                                 <div>
                                     <p className="text-sm font-medium text-gray-600">Charts Generated</p>
                                     <p className="text-2xl font-bold text-gray-900">
-                                           {stats?.chartsGenerated || 
-                                                analyses?.filter(a => 
-                                                    a.chartConfig && 
-                                                    a.chartConfig.xAxis && 
-                                                    a.chartConfig.yAxis
-                                                ).length || 0}
+                                        {stats?.chartsGenerated ?? 0}
                                     </p>
                                 </div>
                             </div>
                         </div>
+
+                        {/* AI Insights Card */}
                         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
                             <div className="flex items-center">
                                 <div className="bg-purple-100 p-2 rounded-lg mr-3">
@@ -219,14 +239,13 @@ const Dashboard = () => {
                                 <div>
                                     <p className="text-sm font-medium text-gray-600">AI Insights</p>
                                     <p className="text-2xl font-bold text-gray-900">
-                                          {stats?.aiInsights || 
-                         analyses?.filter(a => 
-                             a.summary && a.summary.trim().length > 0
-                         ).length || 0}
+                                        {stats?.aiInsights ?? 0}
                                     </p>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Active Analysis Card */}
                         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
                             <div className="flex items-center">
                                 <div className="bg-indigo-100 p-2 rounded-lg mr-3">
